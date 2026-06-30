@@ -14,26 +14,14 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # ---------- LOGIN ----------
 @app.route('/')
 def home():
-    return render_template('login.html')
+    return redirect(url_for('dashboard'))
 
-
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-
-    if username == "admin" and password == "mounika@2027":
-        session['user'] = username
-        return redirect(url_for('dashboard'))
-    else:
-        return "Invalid Login"
 
 
 # ---------- DASHBOARD ----------
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session:
-        return redirect(url_for('home'))
+
 
     from datetime import datetime
     import os
@@ -67,7 +55,7 @@ def dashboard():
     safe_files = len([f for f in files if f["status"] == "Safe"])
     unsafe_files = len([f for f in files if f["status"] == "Unsafe"])
 
-    user = session.get("user", "Guest")
+    user = "Admin"
 
     return render_template(
         "dashboard.html",
@@ -81,8 +69,6 @@ def dashboard():
 # ---------- FILE UPLOAD ----------
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'user' not in session:
-        return redirect(url_for('home'))
 
     file = request.files['file']
     if file and file.filename != "":
@@ -123,3 +109,4 @@ def delete(filename):
 
 if __name__ == "__main__":
     app.run()
+
