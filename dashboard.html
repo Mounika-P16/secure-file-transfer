@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure File Transfer Monitoring System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        SECUREFLOW
+    </div>
+
+    <ul>
+        <li><a href="/dashboard">🏠 Dashboard</a></li>
+        <li><a href="#">📁 Upload History</a></li>
+        <li><a href="#">📜 Activity Log</a></li>
+        <li><a href="#">🛡 Security Status</a></li>
+        <li><a href="/logout">🚪 Logout</a></li>
+    </ul>
+
+</div>
+
+
+<div class="main">
+
+    <div class="header">
+        <h1>Secure File Transfer Monitoring System</h1>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="cards">
+
+        <div class="card">
+            <h1>📁</h1>
+            <h2>{{ files|length }}</h2>
+            <p>Total Files</p>
+        </div>
+
+        <div class="card">
+            <h1>🛡️</h1>
+            <h2>Protected</h2>
+            <p>Security Status</p>
+        </div>
+
+        <div class="card">
+            <h1>🚨</h1>
+            <h2>0</h2>
+            <p>Threat Alerts</p>
+        </div>
+
+        <div class="card">
+            <h1>👤</h1>
+            <h2>{{ user }}</h2>
+            <p>Current User</p>
+        </div>
+
+    </div>
+
+
+    <!-- UPLOAD BOX -->
+    <div class="upload-box">
+
+        <h2>📂 Upload File</h2>
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <br><br>
+            <button class="upload-btn" type="submit">📤 Upload File</button>
+        </form>
+
+    </div>
+
+
+    <!-- FILE TABLE -->
+    <div class="table-box">
+
+        <h2>📂 Uploaded Files</h2>
+
+        <br>
+
+        <input
+            type="text"
+            id="searchInput"
+            onkeyup="searchFiles()"
+            placeholder="🔍 Search files..."
+            style="width:100%;padding:12px;border-radius:8px;border:none;margin-bottom:15px;">
+
+        <table>
+
+            <tr>
+                <th>📄 File Name</th>
+                <th>🕒 Upload Time</th>
+                <th>🛡 Status</th>
+                <th>⬇ Download</th>
+                <th>🗑 Delete</th>
+            </tr>
+
+            {% for file in files %}
+            <tr>
+                <td>{{ file.name }}</td>
+                <td>{{ file.time }}</td>
+
+                {% if file.status == "Safe" %}
+                <td style="color:lime;font-weight:bold;">🟢 Safe</td>
+                {% else %}
+                <td style="color:red;font-weight:bold;">🔴 Unsafe</td>
+                {% endif %}
+
+                <td>
+                    <a href="{{ url_for('download', filename=file.name) }}">
+                        <button class="download-btn">⬇ Download</button>
+                    </a>
+                </td>
+
+                <td>
+                    <a href="{{ url_for('delete', filename=file.name) }}">
+                        <button class="delete-btn">🗑 Delete</button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+
+    <!-- ACTIVITY TABLE -->
+    <div class="table-box">
+
+        <h2>Recent Activity</h2>
+
+        <table>
+
+            <tr>
+                <th>Time</th>
+                <th>Activity</th>
+                <th>Status</th>
+            </tr>
+
+            <tr>
+                <td>10:30 AM</td>
+                <td>Uploaded report.pdf</td>
+                <td style="color:lime;">Success</td>
+            </tr>
+
+            <tr>
+                <td>11:05 AM</td>
+                <td>User Login</td>
+                <td style="color:lime;">Success</td>
+            </tr>
+
+            <tr>
+                <td>11:20 AM</td>
+                <td>Security Scan Completed</td>
+                <td style="color:lime;">Safe</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+function searchFiles() {
+
+    let input = document.getElementById("searchInput");
+    let filter = input.value.toLowerCase();
+    let table = document.querySelector("table");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+
+        let td = tr[i].getElementsByTagName("td")[0];
+
+        if (td) {
+            let txt = td.textContent || td.innerText;
+
+            if (txt.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+</body>
+</html>
